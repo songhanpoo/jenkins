@@ -19,17 +19,16 @@
 
 | Parameter         |   Type    | Default Value | Description                |
 | :---------------- | :---------| :------------ | :------------------------- |
-| `httpPort`        | `number`  |    8080       | **Required**. Static port running jenkins master |
-| `MaxHeapSize`     | `number`  |    1024       | **Required**.  |
-| `jenkinAdmin`     | `string`  |    admin      |   |
-| `jenkinAdminPwd`  | `string`  |    admin      |   |
+| `httpPort`        | `number`  |    8080       | Static port running jenkins master |
+| `MaxHeapSize`     | `string`  |    1024m      | Set MaxHeapSize for jenkins master |
+| `jenkinAdmin`     | `string`  |    admin      | Set admin account for jenkins master |
+| `jenkinAdminPwd`  | `string`  |    admin      | Set password account for jenkins master  |
 | `jenkinsPreferLts`| `boolean` |    true       |   |
-| `jenkins_plugins` | `string`  |    N/A        |   |
-| `jenkinsVer`      | `string`  |    2.303.2    |   |
+| `jenkins_plugins` | `list`  |    N/A          |  Define list plugin for initialize |
+| `jenkinsVer`      | `string`  |    2.303.2    |  Define version for install |
 
 
 
-  
 ## Deployment
 
 To deploy this project run
