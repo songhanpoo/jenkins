@@ -18,7 +18,7 @@ def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
 
 // Set Admin,PWD account
-hudsonRealm.createAccount("{{jenkinAdmin}}", "{{jenkinAdminPwd}}")
+hudsonRealm.createAccount("{{jenkinAdmin | default('admin')}}", "{{jenkinAdminPwd | default('admin')}}")
 instance.setSecurityRealm(hudsonRealm)
 strategy.setAllowAnonymousRead(false)
 instance.setAuthorizationStrategy(strategy)
