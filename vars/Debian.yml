@@ -1,0 +1,10 @@
+jenkinsRepoUrl: deb https://pkg.jenkins.io/debian{{ '-stable' if (jenkinsPreferLts | bool) else '' }} binary/
+jenkinsRepoKeyUrl: https://pkg.jenkins.io/debian{{ '-stable' if (jenkinsPreferLts | bool) else '' }}/jenkins.io.key
+jenkinsIPAddress: "{{ groups['master'] | map('extract', hostvars, ['ansible_ssh_host']) | join('') }}"
+
+jenkinsRepoUrlSpec: https://pkg.jenkins.io/debian-stable/direct
+
+jenkinsDir: /var/lib/jenkins
+jenkinsPATH: /etc/default
+jenkinsSlaveDir: /opt
+

@@ -1,0 +1,103 @@
+---
+- name: Ensure group "{{jenkinsUser | default('jenkins')}}" exists
+  become: true
+  group:
+    name: "{{jenkinsUser | default('jenkins')}}"
+    state: present
+
+- name: Add the user {{jenkinsUser | default('jenkins')}}
+  become: true
+  user:
+    name: "{{jenkinsGroup | default('jenkins')}}"
+    comment: This is user mgmt service jenkins and jenkins-agent
+    group: "{{jenkinsGroup | default('jenkins')}}"
+    state: present
+    create_home: true
+
+- name: Stop Firewalld
+  become: true
+  systemd:
+    name: firewalld
+    state: stopped
+  when: "group_names | join('') == 'master'"
+
+- name: Disable SELINUX
+  become: true
+  command: setenforce 0
+  when: "group_names | join('') == 'master'"
+
+- name: "Deploy config to host"
+  become: true
+  template:
+    src: "{{ansible_os_family}}/jenkins.j2"
+    dest: "{{jenkinsPATH}}/jenkins"
+    backup: yes
+  when: "group_names | join('') == 'master'"
+
+- name: "Deploy script to host"
+  become: true
+  template:
+    src: "init.groovy.j2"
+    dest: "{{jenkinsDir}}/init.groovy.d/init.groovy"
+    backup: yes
+  when: "group_names | join('') == 'master'"
+
+- name: Restart Jenkins
+  become: true
+  systemd:
+    name: jenkins
+    state: restarted
+  when: "group_names | join('') == 'master'"
+
+- name: Pause amoment for restart service and init groovy script
+  pause:
+    minutes: 5
+  when: "group_names | join('') == 'master'"
+
+- name: Remove a groovy script init startup
+  become: true
+  file:
+    path: "{{jenkinsDir}}/init.groovy.d/init.groovy"
+    state: absent
+
+- name: Restart Jenkins Master
+  become: true
+  service:
+    name: jenkins
+    state: restarted
+  when: "group_names | join('') == 'master'"
+
+- name: Pause amoment for restart service and init groovy script
+  pause:
+    minutes: 5
+  when: "group_names | join('') == 'master'"
+
+- name: Check if Agent Jar exists already
+  stat:
+    path: "/home/{{jenkinsUser | default('jenkins')}}/agent.jar"
+  register: jenkinSlaveWinAgentJar
+  when: 
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is defined
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar | bool == true
+
+- name: DEBUG
+  debug:
+    msg: "{{jenkinSlaveWinAgentJar}}"
+  when: 
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is defined
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar | bool == true
+
+- name: Download Jenkins Slave Agent Jar from Jenkins Server
+  become: true
+  get_url:
+    url: "http://{{ jenkinsIPAddress }}:{{httpPort}}/jnlpJars/agent.jar"
+    dest: "/home/{{jenkinsUser | default('jenkins')}}/agent.jar"
+    owner: "{{jenkinsUser | default('jenkins')}}"
+    group: "{{jenkinsUser | default('jenkins')}}"
+  when: 
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is defined
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar | bool == true
+    - jenkinSlaveWinAgentJar.stat.exists | bool == false

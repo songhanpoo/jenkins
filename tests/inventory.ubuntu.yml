@@ -1,0 +1,91 @@
+all:
+  hosts:
+    node1:
+      ansible_ssh_host: 172.16.18.101
+      ip: 172.16.18.101
+      nodeDescription: This is description for this node
+      credentialsDescription: This is description for this node222222
+      remoteFS: "/home/jenkins"
+      numExecutors: 1
+      ansible_ssh_user: vagrant
+      ansible_connection: ssh
+      jenkinsForcedConnectionJar: true
+      # ansible_ssh_pass: vagrant
+      # credentialsKeyPWD: ''
+      ansible_ssh_private_key_file: "/Volumes/STORAGE/VirtualMachine/Nevonex/Vagrant/.vagrant/machines/redhat1/virtualbox/private_key"
+    node2:
+      ansible_ssh_host: 172.16.17.101
+      ip: 172.16.17.101
+      nodeDescription: This is description for this node
+      credentialsDescription: This is description for this node222222
+      remoteFS: "/home/jenkins"
+      numExecutors: 1
+      ansible_ssh_user: vagrant
+      ansible_connection: ssh
+      # ansible_ssh_pass: vagrant
+      # credentialsKeyPWD: ''
+      ansible_ssh_private_key_file: "/Volumes/STORAGE/VirtualMachine/Nevonex/Vagrant/.vagrant/machines/debian1/virtualbox/private_key"
+    node3:
+      ansible_ssh_host: 172.16.16.101
+      ip: 172.16.16.101
+      nodeDescription: This is description for this node
+      credentialsDescription: This is description for this node222222
+      remoteFS: "/home/jenkins"
+      numExecutors: 1
+      ansible_ssh_user: vagrant
+      ansible_connection: ssh
+      # ansible_ssh_pass: vagrant
+      # credentialsKeyPWD: ''
+      ansible_ssh_private_key_file: "/Volumes/STORAGE/VirtualMachine/Nevonex/Vagrant/.vagrant/machines/master1/virtualbox/private_key"
+    # node4:
+    #   ansible_ssh_host: 172.16.18.101
+    #   ip: 172.16.17.101
+    #   nodeDescription: This is description for this node
+    #   credentialsDescription: This is description for this node222222
+    #   remoteFS: "/home/jenkins"
+    #   numExecutors: 1
+    #   ansible_ssh_user: vagrant
+    #   ansible_connection: ssh
+    #   # ansible_ssh_pass: vagrant
+    #   # credentialsKeyPWD: ''
+    #   ansible_ssh_private_key_file: "/Volumes/STORAGE/VirtualMachine/Nevonex/Vagrant/.vagrant/machines/redhat1/virtualbox/private_key"
+
+      # node3:
+    #   ansible_host: 172.16.16.102
+    #   # ip: 172.16.16.101
+    #   # ansible_user: vagrant
+    #   # ansible_password: vagrant
+    #   # ansible_connection: ssh
+    #   forceAgentJarConnection: true
+    #   ansible_winrm_server_cert_validation: ignore
+    #   nodeDescription: This is description for this node
+    #   remoteFS: "C:\\Jenkins"
+    #   numExecutors: 1
+    #   mode: NORMAL
+    #   workDirSettings:
+    #     disabled: false
+    #     workDirPath:
+    #     internalDir: "remoting"
+    #     failIfWorkDirIsMissing: false
+    #   webSocket: false
+    #   tunnel: ""
+    #   vmargs: ""
+    # node2:
+    #   ansible_ssh_host: 172.16.17.102
+    #   ip: 172.16.17.102
+    #   ansible_ssh_user: vagrant
+    #   ansible_ssh_private_key_file: /Volumes/STORAGE/VirtualMachine/Nevonex/Vagrant/.vagrant/machines/nodeate2/virtualbox/private_key
+      # ansible_ssh_common_args: -o "StrictHostKeyChecking no" -o ProxyCommand="ssh -W %h:%p -q hieunlp@172.24.176.200"
+    # node3:
+    #   ansible_ssh_host: 172.16.17.103
+    #   ip: 172.16.17.103
+    #   ansible_ssh_user: vagrant
+  #   #   ansible_ssh_private_key_file: /Volumes/STORAGE/VirtualMachine/Nevonex/Vagrant/.vagrant/machines/nodeate3/virtualbox/private_key
+  children:
+    master:
+      hosts:
+        node1:
+    agent:
+      hosts:
+        node2:
+        node3:

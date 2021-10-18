@@ -1,0 +1,10 @@
+[windows]
+
+win10 ansible_host=172.16.16.101
+
+[windows:vars]
+
+ansible_user=vagrant
+ansible_password=vagrant
+ansible_connection=winrm
+ansible_winrm_server_cert_validation=ignore

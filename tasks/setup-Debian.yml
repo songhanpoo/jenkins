@@ -1,0 +1,83 @@
+---
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Ensure dependencies are installed.
+  apt:
+    name:
+      - curl
+      - apt-transport-https
+      - gnupg
+      - default-jdk
+    state: present
+  become: true
+  when: "group_names | join('') == 'master'"
+
+- name: Add Jenkins apt repository key.
+  apt_key:
+    url: "{{ jenkinsRepoKeyUrl }}"
+    state: present
+  become: true
+  when: 
+    - group_names | join('') == 'master'
+    - jenkinsVer is not defined
+
+- name: Add Jenkins apt repository.
+  apt_repository:
+    repo: "{{ jenkinsRepoUrl }}"
+    state: present
+    update_cache: true
+  become: true
+  when: 
+    - group_names | join('') == 'master'
+    - jenkinsVer is not defined
+
+- name: Download specific Jenkins version.
+  get_url:
+    url: "{{ jenkinsRepoUrlSpec }}/jenkins_{{ jenkinsVer }}_all.deb"
+    dest: "/tmp/jenkins_{{ jenkinsVer }}_all.deb"
+  when: 
+    - jenkinsVer is defined
+    - "group_names | join('') == 'master'"
+
+- name: Check if we downloaded a specific version of Jenkins.
+  stat:
+    path: "/tmp/jenkins_{{ jenkinsVer }}_all.deb"
+  register: specific_version
+  when: 
+    - jenkinsVer is defined
+    - group_names | join('') == 'master'
+
+- name: Install our specific version of Jenkins.
+  become: true
+  apt:
+    deb: "/tmp/jenkins_{{ jenkinsVer }}_all.deb"
+    state: present
+  when: 
+    - group_names | join('') == 'master'
+    - jenkinsVer is defined
+    - specific_version.stat.exists
+
+- name: Ensure Jenkins is installed.
+  apt:
+    name: jenkins
+    state: present
+  when: "group_names | join('') == 'master'"
+
+- name: "Create Jenkins Master Directory For Scripting"
+  become: true
+  file:
+    path: "{{ jenkinsDir }}/init.groovy.d"
+    state: "directory"
+  when: "group_names | join('') == 'master'"
+
+- name: Ensure dependencies are installed.
+  become: true
+  apt:
+    name:
+      - git
+      - openjdk-8-jdk
+    state: present
+  when: "group_names | join('') == 'agent'"

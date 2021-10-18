@@ -1,0 +1,189 @@
+---
+# - name: Generate Token Jenkins
+#   win_uri:
+#     url: http://{{jenkinsIPAddress}}:{{httpPort}}/me/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken?newTokenName=hhh
+#     method: POST
+#     user: "admin"
+#     password: "cf701585bd3a477b8ad9551bf121e38a"
+#     force_basic_auth: true
+#     return_content: true
+#     headers:
+#       Cookie: "{{ crumbIssuer.set_cookie | default('') }}"
+#       Jenkins-Crumb: "{{crumbIssuer.json.crumb}}"
+#   register: tokenJenkins
+
+- name: Add Node With JNLP ( Jar ) Windows
+  uri:
+    url: "http://{{jenkinsIPAddress}}:{{httpPort}}/scriptText"
+    method: POST
+    body_format: form-urlencoded
+    headers:
+      Cookie: "{{ crumbIssuer.set_cookie | default('') }}"
+      Jenkins-Crumb: "{{crumbIssuer.json.crumb}}"
+    body: 
+      script: "import jenkins.model.*\nimport hudson.model.*\nimport hudson.slaves.*\nJenkins.instance.addNode(new DumbSlave(\"{{inventory_hostname | string }}\",\"{{hostvars[inventory_hostname].nodeDescription | string }}\",\"{{hostvars[inventory_hostname].remoteFS}}\",\"{{hostvars[inventory_hostname].numExecutors | int }}\",Node.Mode.NORMAL,\"{{inventory_hostname | string }}\",new JNLPLauncher(),new RetentionStrategy.Always(),new LinkedList()))"
+    user: "{{jenkinAdmin}}"
+    password: "{{ jenkinAdminPwd }}"
+    force_basic_auth: true
+    return_content: true
+  changed_when: false
+  register: jenkinsSlaveWinAgentSecret
+  tags:
+    - jenkins-secret
+  delegate_to: localhost
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].ansible_connection | string == 'winrm'
+
+
+- name: Add Node With JNLP ( Jar ) Linux
+  uri:
+    url: "http://{{jenkinsIPAddress}}:{{httpPort}}/scriptText"
+    method: POST
+    body_format: form-urlencoded
+    headers:
+      Cookie: "{{ crumbIssuer.set_cookie | default('') }}"
+      Jenkins-Crumb: "{{crumbIssuer.json.crumb}}"
+    body: 
+      script: "import jenkins.model.*\nimport hudson.model.*\nimport hudson.slaves.*\nJenkins.instance.addNode(new DumbSlave(\"{{inventory_hostname | string }}\",\"{{hostvars[inventory_hostname].nodeDescription | string }}\",\"{{hostvars[inventory_hostname].remoteFS}}\",\"{{hostvars[inventory_hostname].numExecutors | int }}\",Node.Mode.NORMAL,\"{{inventory_hostname | string }}\",new JNLPLauncher(),new RetentionStrategy.Always(),new LinkedList()))"
+    user: "{{jenkinAdmin}}"
+    password: "{{ jenkinAdminPwd }}"
+    force_basic_auth: true
+    return_content: true
+  changed_when: false
+  tags:
+    - jenkins-secret
+  delegate_to: localhost
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is defined
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar | bool == true
+
+- name: Add Node With SSH
+  uri:
+    url: "http://{{jenkinsIPAddress}}:{{httpPort}}/scriptText"
+    method: POST
+    body_format: form-urlencoded
+    headers:
+      Cookie: "{{ crumbIssuer.set_cookie | default('') }}"
+      Jenkins-Crumb: "{{crumbIssuer.json.crumb}}"
+    body: 
+      script: "import jenkins.model.*\nimport hudson.model.*\nimport hudson.slaves.*\nimport hudson.plugins.sshslaves.*\nJenkins.instance.addNode(new DumbSlave(\"{{inventory_hostname}}\",\"{{hostvars[inventory_hostname].nodeDescription}}\",\"{{hostvars[inventory_hostname].remoteFS}}\",\"1\",Node.Mode.NORMAL,\"{{inventory_hostname}}\",new SSHLauncher(\"{{hostvars[inventory_hostname].ansible_ssh_host}}\", {{hostvars[inventory_hostname].ansible_port | default('22') | int}},\"be821eaa-7fa2-4aed-a6f2-8c4267ef1e1b\"),new RetentionStrategy.Always(),new LinkedList()))"
+    user: "{{jenkinAdmin}}"
+    password: "{{ jenkinAdminPwd }}"
+    force_basic_auth: true
+    return_content: true
+  changed_when: false
+  tags:
+    - jenkins-secret
+  delegate_to: localhost
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].ansible_connection | string == 'ssh'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is not defined
+
+- name: Get Jenkins Slave's Secret for Windows
+  uri:
+    url: "http://{{jenkinsIPAddress}}:{{httpPort}}/scriptText"
+    method: POST
+    headers:
+      Cookie: "{{ crumbIssuer.set_cookie | default('') }}"
+      Jenkins-Crumb: "{{crumbIssuer.json.crumb}}"
+    body: "script=println jenkins.model.Jenkins.instance.nodesObject.getNode('{{ inventory_hostname | lower }}')?.computer?.jnlpMac"
+    user: "{{jenkinAdmin}}"
+    password: "{{ jenkinAdminPwd }}"
+    force_basic_auth: true
+    return_content: true
+  changed_when: false
+  register: jenkinsSlaveWinAgentSecret
+  tags:
+    - jenkins-secret
+  delegate_to: localhost
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].ansible_connection | string == 'winrm'
+
+- name: Get Jenkins Slave's Secret for Linux
+  uri:
+    url: "http://{{jenkinsIPAddress}}:{{httpPort}}/scriptText"
+    method: POST
+    headers:
+      Cookie: "{{ crumbIssuer.set_cookie | default('') }}"
+      Jenkins-Crumb: "{{crumbIssuer.json.crumb}}"
+    body: "script=println jenkins.model.Jenkins.instance.nodesObject.getNode('{{ inventory_hostname | lower }}')?.computer?.jnlpMac"
+    user: "{{jenkinAdmin}}"
+    password: "{{ jenkinAdminPwd }}"
+    force_basic_auth: true
+    return_content: true
+  changed_when: false
+  register: jenkinsSlaveLinuxAgentSecret
+  tags:
+    - jenkins-secret
+  delegate_to: localhost
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is defined
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar | bool == true
+
+- name: debug debug
+  debug:
+    msg: "{{jenkinsSlaveLinuxAgentSecret}}"
+
+- name: Create Service Jenkins For Agent Windows
+  win_template:
+    src: "{{ansible_os_family}}/agent.bat.j2"
+    dest: "{{ jenkinsSlaveDir }}\\agent.bat"
+  notify: Restart Jenkins Slave
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].ansible_connection | string == 'winrm'
+
+- name: Install Jenkins Slave Service via NSSM
+  win_nssm:
+    name: Jenkins
+    application: "{{ jenkinsSlaveDir }}\\agent.bat"
+    user: "{{ hostvars[inventory_hostname].ansible_user }}"
+    password: "{{ hostvars[inventory_hostname].ansible_password }}"
+  notify: restart
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].ansible_connection | string == 'winrm'
+
+- name: Create Service Jenkins For Agent Linux
+  become: true
+  template:
+    src: "{{ansible_os_family}}/jenkins-agent.service.j2"
+    dest: "/etc/systemd/system/jenkins-agent.service"
+  when:
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].ansible_connection | string == 'ssh'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is defined
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar | bool == true
+
+- name: Restart Jenkins-agent
+  become: true
+  systemd:
+    name: jenkins-agent
+    daemon_reload: yes
+    state: restarted
+  when: 
+    - group_names | join('') == 'agent'
+    - hostvars[inventory_hostname].ansible_connection | string == 'ssh'
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar is defined
+    - hostvars[inventory_hostname].jenkinsForcedConnectionJar | bool == true
+
+- name: Launch Agent SSH
+  run_once: true
+  uri:
+    url: "http://{{jenkinsIPAddress}}:{{httpPort}}/scriptText"
+    method: POST
+    body_format: form-urlencoded
+    headers:
+      Cookie: "{{ crumbIssuer.set_cookie | default('') }}"
+      Jenkins-Crumb: "{{crumbIssuer.json.crumb}}"
+    body: 
+      script: "import hudson.model.*\nfor ( item in hudson.model.Hudson.instance.slaves) { if (item.getComputer()isLaunchSupported()){ item.getComputer().connect(true)}}"
+    user: "{{jenkinAdmin}}"
+    password: "{{ jenkinAdminPwd }}"
+    force_basic_auth: true
+  delegate_to: localhost

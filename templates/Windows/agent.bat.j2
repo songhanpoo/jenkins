@@ -1,0 +1,3 @@
+set JENKINS_DIR={{ jenkinsSlaveDir }}
+
+java {{ jenkinsSlaveWinJavaArgs }} -jar {{jenkinsSlaveDir}}\\agent.jar -jnlpUrl http://{{ groups['master'] | map('extract', hostvars, ['ansible_host']) | join ('') }}:8080/computer/{{ inventory_hostname | lower }}/slave-agent.jnlp -secret {{ jenkinsSlaveWinAgentSecret.content }} -workDir %JENKINS_DIR%

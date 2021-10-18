@@ -1,0 +1,71 @@
+---
+- name: Ensure group "{{jenkinsUser | default('jenkins')}}" exists
+  win_group:
+    name: "{{jenkinsUser | default('jenkins')}}"
+    state: present
+
+- name: Add the user {{jenkinsUser | default('jenkins')}}
+  win_user:
+    name: "{{jenkinsGroup | default('jenkins')}}"
+    comment: This is user mgmt service jenkins and jenkins-agent
+    group: "{{jenkinsGroup | default('jenkins')}}"
+    state: present
+
+- name: "Deploy config to host"
+  win_template:
+    src: "{{ansible_os_family}}/jenkins.win.xml.j2"
+    dest: "{{jenkinsDir}}\\jenkins.xml"
+    newline_sequence: '\n'
+    backup: yes
+  notify: restart
+  when: "group_names | join('') == 'master'"
+
+- name: "Deploy script to host"
+  win_template:
+    src: "init.groovy.j2"
+    dest: "{{jenkinsDir}}\\init.groovy.d\\init.groovy"
+    newline_sequence: '\n'
+    backup: yes
+  when: "group_names | join('') == 'master'"
+
+- name: Restart Jenkins Master
+  win_service:
+    name: jenkins
+    state: restarted
+  when: "group_names | join('') == 'master'"
+
+- name: Pause amoment for restart service and init groovy script
+  pause:
+    minutes: 5
+  when: "group_names | join('') == 'master'"
+
+- name: Remove a groovy script init startup
+  become: true
+  file:
+    path: "{{jenkinsDir}}/init.groovy.d/init.groovy"
+    state: absent
+
+- name: Restart Jenkins Master
+  win_service:
+    name: jenkins
+    state: restarted
+  when: "group_names | join('') == 'master'"
+
+- name: Pause amoment for restart service and init groovy script
+  pause:
+    minutes: 5
+  when: "group_names | join('') == 'master'"
+
+- name: Check if Agent Jar exists already
+  win_stat:
+    path: "{{ jenkinsSlaveDir }}\\agent.jar"
+  register: jenkinSlaveWinAgentJar
+  when: "group_names | join('') == 'agent'"
+
+- name: Download Jenkins Slave Agent Jar from Jenkins Server
+  win_get_url:
+    url: "http://{{ jenkinsIPAddress }}:{{httpPort}}/jnlpJars/agent.jar"
+    dest: "{{ jenkinsSlaveDir }}\\agent.jar"
+  when: 
+    - jenkinSlaveWinAgentJar.stat.exists == false
+    - "group_names | join('') == 'agent'"

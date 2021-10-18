@@ -1,0 +1,11 @@
+# For RedHat/CentOS:
+jenkinsRepoUrl: https://pkg.jenkins.io/redhat{{ '-stable' if (jenkinsPreferLts | bool) else '' }}/jenkins.repo
+jenkinsRepoKeyUrl: https://pkg.jenkins.io/redhat{{ '-stable' if (jenkinsPreferLts | bool) else '' }}/jenkins.io.key
+jenkinsIPAddress: "{{ groups['master'] | map('extract', hostvars, ['ansible_ssh_host']) | join('') }}"
+
+jenkinsPATH: /etc/sysconfig
+jenkinsDir: /var/lib/jenkins
+jenkinsSlaveDir: /opt
+
+
+jenkinsPkgUrl: https://archives.jenkins-ci.org/redhat-stable

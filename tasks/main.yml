@@ -1,0 +1,26 @@
+---
+# # tasks file for jenkins
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+
+- name: DEBUG
+  debug:
+    msg:
+      - "{{jenkinsPkgUrl}}"
+      - "{{jenkinsRepoKeyUrl}}"
+  when:
+      - group_names | join('') == 'master'
+
+# Setup/install tasks.
+- name: Setup task for anyOS
+  include_tasks: "setup-{{ ansible_os_family }}.yml"
+
+- name: Configuration task for anyOS
+  include_tasks: "config-{{ ansible_os_family }}.yml"
+
+- name: Add Credentials
+  include_tasks: "credentials.yml"
+
+- name: Add Node Jar and SSH
+  include_tasks: "node.yml"

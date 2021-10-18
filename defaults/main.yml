@@ -1,0 +1,4 @@
+---
+# defaults file for jenkins
+jenkinsPreferLts: false
+jenkins_plugins_state: present

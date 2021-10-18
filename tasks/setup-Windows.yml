@@ -1,0 +1,43 @@
+---
+- name: "Install chocolatey"
+  win_chocolatey:
+    name:
+      - chocolatey
+      - chocolatey-core.extension
+      - Jenkins
+      - jdk8
+    state: present
+  when: "group_names | join('') == 'master'"
+
+- name: "Create Jenkins Master Directory For Scripting"
+  win_file:
+    path: "{{ jenkinsDir }}\\init.groovy.d"
+    state: "directory"
+  when: "group_names | join('') == 'master'"
+
+- name: "Create Jenkins Slave Directory"
+  win_file:
+    path: "{{ jenkinsSlaveDir }}"
+    state: "directory"
+  when: "group_names | join('') == 'agent'"
+
+- name: "Manage Jenkins Slave Directory Permissions"
+  win_acl:
+    path: "{{ jenkinsSlaveDir }}"
+    propagation: "InheritOnly"
+    rights: "FullControl"
+    type: "allow"
+    user: "{{jenkinsUser | default('jenkins')}}"
+  when: 
+    - "group_names | join('') == 'agent'"
+    - hostvars[inventory_hostname].ansible_connection | string == 'winrm'
+
+- name: "Install needed packages via Chocolatey"
+  win_chocolatey:
+    name:
+      - jre8
+      - nssm
+    state: present
+  when: 
+    - "group_names | join('') == 'agent'"
+    - hostvars[inventory_hostname].ansible_connection | string == 'winrm'

@@ -1,0 +1,13 @@
+---
+# handlers file for jenkins
+- name: Restart Jenkins
+  win_service:
+    name: jenkins
+    state: restarted
+  listen: restart windows
+
+- name: Restart Jenkins
+  systemd:
+    name: jenkins
+    state: restarted
+  listen: restart debian

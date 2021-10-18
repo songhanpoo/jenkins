@@ -1,0 +1,31 @@
+---
+- hosts: all
+  gather_facts: true
+  roles:
+    - {role: 'jenkins',tags: 'jenkins'}
+  vars:
+    httpPort: 8080
+    MaxHeapSize: 1024m
+    jenkinAdmin: admin
+    # jenkinsVer: "2.303.2"
+    jenkinsPreferLts: true
+    jenkinAdminPwd: admin
+    jenkinsSlaveWinJavaArgs: "-Xmx768m"
+    jenkins_plugins:
+      - uno-choice
+      - git
+      - github
+      - ssh-slaves
+
+      # - GitHub Branch Source
+      # - LDAP
+      # - Matrix Authorization Strategy
+      # - Pipeline
+      # - OWASP Markup
+      # - Build timeout
+      # - Credentials Binding
+      # - Ant
+      # - Pipeline Github Groovy
+      # - SSH Build Agent
+
+      # - "uno-choice","git","github","no-choice","github-oauth","token-macro","loudbees-folder","job-dsl","view-job-filters","mbeddable-build-status","groovy","dashboard-view","rich-text-publisher-plugin","console-column-plugin","docker-plugin"
