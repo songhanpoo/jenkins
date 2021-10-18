@@ -33,9 +33,10 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - all
-    - name: Windows
+    - name: "Windows"
       versions:
-        - 10
+        - "2016"
+        - "2019"
 
   galaxy_tags:
     - development
