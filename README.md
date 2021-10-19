@@ -12,10 +12,8 @@
 - Automate Add Node with SSH mode and JNLP
 - Automate Add Credentials for NODE SSH mode
 
-  
-## Parameter Reference
+  ## Parameter Reference
 
-#### Master node
 
 | Parameter         |   Type    | Default Value | Description                |
 | :---------------- | :---------| :------------ | :------------------------- |
@@ -24,10 +22,8 @@
 | `jenkinAdmin`     | `string`  |    admin      | Set admin account for jenkins master |
 | `jenkinAdminPwd`  | `string`  |    admin      | Set password account for jenkins master  |
 | `jenkinsPreferLts`| `boolean` |    true       |   |
-| `jenkins_plugins` | `list`  |    N/A          |  Define list plugin for initialize |
-| `jenkinsVer`      | `string`  |    2.303.2    |  Define version for install |
-
-
+| `jenkins_plugins` | `list`    |    N/A        |  Define list plugin for initialize |
+| `jenkinsVer`      | `string`  |    N/A        |  Define version for install |
 
 ## Deployment
 
@@ -36,11 +32,16 @@ To deploy this project run
 ```bash
     git clone https://github.com/songhanpoo/jenkins.git
 ```
+#### Linux Environment
+```bash
+    ansible-playbook -i test/inventories.ubuntu.yml test/playbook.yml -u <user> -K
+```
+
+#### Windows Environment
 
 ```bash
-    ansible-playbook -i test/inventories.yml test/playbook.yml -u <user> -K
+    ansible-playbook -i test/inventories.windows.yml test/playbook.yml -u <user> -K
 ```
-  
 ## Structure role
 
 This project is used by the following companies:
@@ -88,4 +89,32 @@ This project is used by the following companies:
 
 ```
 
+  
+## Documentation
+
+[Setup a Windows Host](https://linktodocumentation)
+
+  
+## Authors
+
+
+[![MIT License](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/songhanpoo)
+
+[![MIT License](https://img.shields.io/badge/dev.to-0A0A0A?style=for-the-badge&logo=dev.to&logoColor=white
+)](https://stackoverflow.com/users/10084143/songhanpoo)
+
+[![MIT License](https://img.shields.io/badge/Stack_Overflow-FE7A16?style=for-the-badge&logo=stack-overflow&logoColor=white)](https://stackoverflow.com/users/10084143/songhanpoo)
+
+## Ansible Galaxy Collection
+
+**ansible.windows:** win_file, win_template, win_stat, win_acl, win_service, win_get_url
+
+**chocolatey.chocolatey:** win_chocolatey
+
+  
+## Support Environments
+
+[![MIT License](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/songhanpoo)
+
+[![MIT License](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://github.com/songhanpoo)
   

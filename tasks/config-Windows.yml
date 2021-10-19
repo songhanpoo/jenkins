@@ -41,8 +41,8 @@
 
 - name: Remove a groovy script init startup
   become: true
-  file:
-    path: "{{jenkinsDir}}/init.groovy.d/init.groovy"
+  win_file:
+    path: "{{jenkinsDir}}\\init.groovy.d\\init.groovy"
     state: absent
 
 - name: Restart Jenkins Master
