@@ -92,7 +92,7 @@ This project is used by the following companies:
   
 ## Documentation
 
-[Setup a Windows Host](https://linktodocumentation)
+[Setup a Windows Host](https://www.techbeatly.com/2020/12/configure-your-windows-host-to-manage-by-ansible.html)
 
   
 ## Authors
