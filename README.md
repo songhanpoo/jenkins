@@ -21,7 +21,7 @@
 | `MaxHeapSize`     | `string`  |    1024m      | Set MaxHeapSize for jenkins master |
 | `jenkinAdmin`     | `string`  |    admin      | Set admin account for jenkins master |
 | `jenkinAdminPwd`  | `string`  |    admin      | Set password account for jenkins master  |
-| `jenkinsPreferLts`| `boolean` |    true       |   |
+| `jenkinsPreferLts`| `boolean` |    true       |  Config enable long term support for version jenkins. |
 | `jenkins_plugins` | `list`    |    N/A        |  Define list plugin for initialize |
 | `jenkinsVer`      | `string`  |    N/A        |  Define version for install |
 
